@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aplikasi Ujian Sekolah</title>
+    
+    <!-- ============================================== -->
+    <!-- SISTEM OFFLINE TAILWIND CSS (OPTIMIZED) -->
+    <!-- ============================================== -->
+    <script>
+        // Fungsi fallback cerdas: Memuat CDN hanya jika file lokal gagal/tidak ada
+        function loadTailwindFallback() {
+            var script = document.createElement('script');
+            script.src = 'https://cdn.tailwindcss.com';
+            document.head.appendChild(script);
+        }
+    </script>
+    <!-- Coba muat tailwind lokal, jika error (tidak ada), langsung muat fallback -->
+    <script src="tailwind.js" onerror="loadTailwindFallback()"></script>
+    
+    <style>
+        @keyframes float {
+            0% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-8px) scale(1.03); }
+            100% { transform: translateY(0px) scale(1); }
+        }
+        .animate-float {
+            animation: float 3.5s ease-in-out infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            50% { top: 100%; }
+            100% { top: 0; }
+        }
+        .animate-scan {
+            animation: scan 2s linear infinite;
+        }
+        /* Menyembunyikan scrollbar agar rapi */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+        /* Mencegah seleksi teks dan klik kanan yang tidak sengaja */
+        .select-none {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        /* PENTING: Menghilangkan jeda 300ms pada tombol HP agar respon instan */
+        button, a, input {
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body class="flex justify-center bg-black min-h-[100dvh] font-sans select-none">
+    
+    <!-- Container Utama -->
+    <div class="w-full max-w-md h-[100dvh] bg-slate-50 relative overflow-hidden flex flex-col shadow-2xl">
+        
+        <!-- ============================================== -->
+        <!-- SCREEN: LOGIN -->
+        <!-- ============================================== -->
+        <div id="screen-login" class="flex-1 flex flex-col relative bg-slate-50 overflow-hidden">
+            <div class="absolute top-[-10%] left-[-20%] w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-pulse"></div>
+            <div class="absolute bottom-[-10%] right-[-20%] w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-pulse" style="animation-delay: 2s;"></div>
+            
+            <div class="flex-1 flex flex-col justify-center items-center px-6 pb-12 z-10 relative">
+                
+                <!-- Logo & Header -->
+                <div class="flex flex-col items-center justify-center mb-8 w-full mt-4">
+                    <div class="relative flex items-center justify-center w-32 h-32 mb-5">
+                        <div class="absolute inset-0 bg-blue-400 rounded-full blur-[30px] opacity-20"></div>
+                        <!-- LOGO OFFLINE FALLBACK -->
+                        <img 
+                            src="logo.png"
+                            alt="Logo SMPN 6 Manokwari"
+                            onerror="if(this.src!='https://i.ibb.co.com/JWy6dhzM/LOGO-SMP6-1-removebg-preview.png'){this.src='https://i.ibb.co.com/JWy6dhzM/LOGO-SMP6-1-removebg-preview.png'}else{this.onerror=null; this.outerHTML='<div class=\'flex items-center justify-center bg-white rounded-full border-2 border-blue-600 w-24 h-24\'><svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' class=\'text-blue-700 w-12 h-12\'><path d=\'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-3 6-3s4 2 6 3a1 1 0 0 1 1 1v7z\'/><path d=\'m9 12 2 2 4-4\'/></svg></div>'}"
+                            class="w-28 h-28 object-contain animate-float drop-shadow-2xl relative z-10"
+                        />
+                    </div>
+                    <div class="text-center px-2">
+                        <h2 class="font-black text-2xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-indigo-700 mb-1 leading-tight">APLIKASI UJIAN SEKOLAH</h2>
+                        <p class="text-slate-600 text-[13px] font-bold uppercase tracking-[0.15em] mt-1">SMP NEGERI 6 MANOKWARI</p>
+                    </div>
+                </div>
+                
+                <!-- Login Glass Card -->
+                <div class="w-full bg-white/70 backdrop-blur-xl p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-white/80 relative">
+                    <div class="mb-8 text-center">
+                        <h3 class="text-xl font-extrabold text-slate-800 mb-1">Selamat Datang</h3>
+                        <p class="text-[13px] text-slate-500 font-medium">Masuk untuk memulai sesi ujian Anda</p>
+                    </div>
+
+                    <form id="form-login" class="space-y-5 w-full" onsubmit="handleLogin(event)">
+                        <div class="relative group">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
+                                <svg id="icon-lock" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors duration-300">
+                                    <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                                </svg>
+                            </div>
+                            <input
+                                type="password"
+                                id="input-password"
+                                placeholder="Kata Sandi Sesi..."
+                                oninput="hideLoginError()"
+                                class="w-full pl-14 pr-4 py-4 rounded-2xl border-2 border-slate-200 bg-white/50 focus:bg-white focus:border-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-600/10 transition-all text-slate-800 font-bold text-lg placeholder-slate-400 shadow-inner"
+                                required
+                            />
+                        </div>
+                        
+                        <p id="error-login" class="text-red-500 text-sm font-bold text-center -mt-2 animate-pulse hidden">
+                            Kata sandi salah! Silakan coba lagi.
+                        </p>
+                        
+                        <button
+                            type="submit"
+                            class="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold text-base shadow-[0_10px_20px_-10px_rgba(79,70,229,0.5)] hover:shadow-[0_10px_20px_-10px_rgba(79,70,229,0.7)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 flex justify-center items-center gap-2 mt-2"
+                        >
+                            <span>Masuk Aplikasi</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+            
+            <div class="absolute bottom-6 text-center w-full left-0 z-10">
+                <p class="text-slate-400 text-[11px] font-bold tracking-widest uppercase">Versi 14.0.0 • Sistem Terintegrasi</p>
+            </div>
+        </div>
+
+
+        <!-- ============================================== -->
+        <!-- SCREEN: HOME -->
+        <!-- ============================================== -->
+        <div id="screen-home" class="flex-1 flex flex-col bg-slate-100 pb-[80px] hidden">
+            <!-- Top App Bar -->
+            <div class="bg-blue-700 shadow-sm z-10 rounded-b-2xl pb-4">
+                <div class="px-5 pt-6 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="relative flex items-center justify-center w-12 h-12">
+                            <img 
+                                src="logo.png" 
+                                onerror="if(this.src!='https://i.ibb.co.com/JWy6dhzM/LOGO-SMP6-1-removebg-preview.png'){this.src='https://i.ibb.co.com/JWy6dhzM/LOGO-SMP6-1-removebg-preview.png'}else{this.onerror=null; this.outerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'white\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' class=\'w-8 h-8\'><path d=\'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-3 6-3s4 2 6 3a1 1 0 0 1 1 1v7z\'/></svg>'}"
+                                class="w-10 h-10 object-contain animate-float drop-shadow-xl" 
+                            />
+                        </div>
+                        <div>
+                            <h1 class="text-sm font-bold text-white tracking-wide leading-tight">APLIKASI UJIAN SEKOLAH</h1>
+                            <p class="text-xs text-blue-200 font-medium tracking-wider mt-0.5">SMP NEGERI 6 MANOKWARI</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Tombol Keluar dengan Sistem Tahan (Long Press) dan Pencegah Context Menu -->
+                    <button 
+                        oncontextmenu="return false;"
+                        onmousedown="startHoldExit(event)"
+                        onmouseup="cancelHoldExit(event)"
+                        onmouseleave="cancelHoldExit(event)"
+                        ontouchstart="startHoldExit(event)"
+                        ontouchend="cancelHoldExit(event)"
+                        class="relative w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white active:scale-95 transition-transform shadow-md border border-blue-500 overflow-hidden group select-none"
+                        title="Tahan 5 detik untuk keluar"
+                    >
+                        <!-- Indikator Progress Tahan -->
+                        <div id="hold-progress" class="absolute bottom-0 left-0 w-full bg-red-600 h-0 transition-all duration-100 opacity-90 z-0"></div>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 ml-1 relative z-10 group-hover:scale-110 transition-transform">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto px-5 pt-6 pb-4 space-y-5">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-800"><span id="txt-greeting">Selamat Pagi</span>,</h2>
+                    <p class="text-slate-500 font-medium">Selamat datang di portal ujian CBT.</p>
+                </div>
+
+                <div class="bg-white rounded-3xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 flex justify-between items-center">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                                <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-0.5">IP Server Ujian</p>
+                            <p id="txt-server-ip" class="text-sm font-bold text-slate-800 font-mono">192.168.0.123/smp6/login.php</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-amber-100 rounded-2xl p-4 flex items-start gap-3 border border-amber-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+                    </svg>
+                    <div>
+                        <h3 class="text-sm font-bold text-amber-900">Persiapan Ujian</h3>
+                        <p class="text-xs text-amber-800 mt-1 leading-relaxed font-medium">
+                            Pastikan baterai perangkat Anda mencukupi dan jangan keluar dari aplikasi selama ujian berlangsung.
+                        </p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 mb-3 ml-1">Metode Masuk Ujian</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="openQrModal()" class="bg-white p-5 rounded-3xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 flex flex-col items-center justify-center gap-3 active:scale-95 transition-all">
+                            <div class="w-14 h-14 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7">
+                                    <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-bold text-slate-700">Scan QR</span>
+                        </button>
+
+                        <button onclick="openIpModal()" class="bg-white p-5 rounded-3xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-slate-100 flex flex-col items-center justify-center gap-3 active:scale-95 transition-all">
+                            <div class="w-14 h-14 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-7 h-7">
+                                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-bold text-slate-700">Input IP Server</span>
+                        </button>
+
+                        <button onclick="mulaiUjian()" class="col-span-2 bg-blue-600 p-5 rounded-3xl shadow-[0_4px_20px_rgba(37,99,235,0.25)] flex items-center justify-between active:scale-95 transition-all group mt-2">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white backdrop-blur-sm">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6">
+                                        <path d="m10 7 5 3-5 3Z"/><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M12 17v4"/><path d="M8 21h8"/>
+                                    </svg>
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="text-lg font-bold text-white">Mulai E-Ujian</h4>
+                                    <p class="text-xs text-blue-100 font-medium mt-0.5">Masuk ke server sekolah</p>
+                                </div>
+                            </div>
+                            <div class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-white group-hover:translate-x-1 transition-transform">
+                                    <path d="m9 18 6-6-6-6"/>
+                                </svg>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ============================================== -->
+        <!-- SCREEN: DEVELOPER / PROFIL -->
+        <!-- ============================================== -->
+        <div id="screen-profile" class="flex-1 flex flex-col bg-slate-50 pb-[80px] hidden">
+            <div class="bg-white shadow-sm z-10">
+                <div class="px-5 py-5 border-b border-slate-100">
+                    <h1 class="text-lg font-bold text-slate-800">Profil & Sistem</h1>
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto">
+                <div class="bg-white pt-8 pb-6 flex flex-col items-center">
+                    <div class="relative">
+                        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 border-4 border-white shadow-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-12 h-12">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <div id="wifi-indicator" class="absolute bottom-0 right-0 w-6 h-6 border-2 border-white rounded-full bg-green-500"></div>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-800 mt-4">Peserta Ujian</h2>
+                    <p id="wifi-status-text" class="text-sm font-bold mt-1 text-emerald-600">
+                        Status: Jaringan Lokal (Mode Ujian)
+                    </p>
+                </div>
+
+                <div class="px-5 mt-6 mb-2">
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Informasi Aplikasi</h3>
+                </div>
+
+                <div class="bg-white border-y border-slate-100">
+                    <button onclick="openGuideModal()" class="w-full flex items-center px-5 py-4 border-b border-slate-50 active:bg-slate-50 transition-colors text-left">
+                        <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600 mr-4 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-base font-bold text-slate-800">Panduan Penggunaan</h4>
+                            <p class="text-sm text-slate-500 mt-0.5">Cara menghubungkan ke server ujian</p>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-slate-400">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </button>
+
+                    <div class="flex items-center px-5 py-4 border-b border-slate-50 active:bg-slate-50 transition-colors">
+                        <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mr-4 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                                <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-3 6-3s4 2 6 3a1 1 0 0 1 1 1v7z"/><path d="m9 12 2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-base font-bold text-slate-800">Nama Sekolah</h4>
+                            <p class="text-sm text-slate-500 mt-0.5">SMP NEGERI 6 MANOKWARI</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center px-5 py-4 border-b border-slate-50 active:bg-slate-50 transition-colors">
+                        <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 mr-4 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                                <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-base font-bold text-slate-800">Versi Klien</h4>
+                            <p class="text-sm text-slate-500 mt-0.5">Aplikasi Ujian v14.0.0 (Offline Build)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center px-5 py-4 active:bg-slate-50 transition-colors">
+                        <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-slate-600 mr-4 shrink-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                                <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-base font-bold text-slate-800">Pengembang</h4>
+                            <p class="text-sm text-slate-500 mt-0.5">TIM IT SMP NEGERI 6 MANOKWARI</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-10 mb-6 text-center flex flex-col items-center">
+                    <div class="relative flex items-center justify-center w-12 h-12 opacity-40 grayscale mb-3">
+                        <img 
+                            src="logo.png" 
+                            onerror="if(this.src!='https://i.ibb.co.com/JWy6dhzM/LOGO-SMP6-1-removebg-preview.png'){this.src='https://i.ibb.co.com/JWy6dhzM/LOGO-SMP6-1-removebg-preview.png'}else{this.onerror=null; this.outerHTML='<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\' class=\'w-10 h-10\'><path d=\'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2-1 4-3 6-3s4 2 6 3a1 1 0 0 1 1 1v7z\'/></svg>'}"
+                            class="w-10 h-10 object-contain" 
+                        />
+                    </div>
+                    <p class="text-xs font-bold text-slate-400">© 2026 Hak Cipta Dilindungi</p>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ============================================== -->
+        <!-- BOTTOM NAVIGATION -->
+        <!-- ============================================== -->
+        <div id="bottom-nav" class="absolute bottom-0 left-0 w-full bg-[#f8f9fa] flex justify-around items-center px-2 py-3 z-40 pb-safe hidden">
+            <button onclick="switchScreen('home')" class="flex flex-col items-center gap-1 min-w-[64px] active:scale-95 transition-transform">
+                <div id="nav-bg-home" class="px-5 py-1.5 rounded-full transition-colors duration-300 bg-blue-200 text-blue-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </div>
+                <span id="nav-txt-home" class="text-[11px] font-bold text-blue-800">Beranda</span>
+            </button>
+
+            <button onclick="switchScreen('profile')" class="flex flex-col items-center gap-1 min-w-[64px] active:scale-95 transition-transform">
+                <div id="nav-bg-profile" class="px-5 py-1.5 rounded-full transition-colors duration-300 text-slate-600">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                        <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <span id="nav-txt-profile" class="text-[11px] font-bold text-slate-600">Profil</span>
+            </button>
+        </div>
+
+
+        <!-- ============================================== -->
+        <!-- MODALS & TOASTS -->
+        <!-- ============================================== -->
+        
+        <!-- Toast Notification -->
+        <div id="toast" class="absolute top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full text-sm font-bold z-[70] shadow-xl transition-opacity duration-300 opacity-0 pointer-events-none whitespace-nowrap hidden">
+            Pesan Notifikasi
+        </div>
+
+        <!-- Modal Input IP -->
+        <div id="modal-ip" class="absolute inset-0 bg-black/60 z-[60] items-center justify-center p-4 backdrop-blur-sm hidden flex">
+            <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl transform transition-all border border-slate-100">
+                <h3 class="text-lg font-bold text-slate-800 mb-2">Pengaturan Server</h3>
+                <p class="text-sm text-slate-500 mb-4">Masukkan IP Address Laptop Server. Sistem menolak URL publik untuk mode offline.</p>
+                
+                <input
+                    type="text"
+                    id="input-ip"
+                    placeholder="Contoh: 192.168.0.123/smp6/login.php"
+                    oninput="document.getElementById('error-ip').classList.add('hidden')"
+                    class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:outline-none font-mono text-sm mb-2 text-center text-slate-800 bg-slate-50"
+                />
+                
+                <p id="error-ip" class="text-red-500 text-xs font-medium mb-4 text-center hidden">Format IP/URL Lokal tidak valid!</p>
+                
+                <div class="flex gap-3 mt-6">
+                    <button onclick="closeIpModal()" class="flex-1 py-3.5 rounded-xl bg-slate-100 text-slate-700 font-bold active:bg-slate-200 transition-colors">Batal</button>
+                    <button onclick="saveIp()" class="flex-1 py-3.5 rounded-xl bg-blue-600 text-white font-bold shadow-md hover:bg-blue-700 active:scale-95 transition-all">Simpan IP</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Panduan -->
+        <div id="modal-guide" class="absolute inset-0 bg-black/60 z-[60] items-center justify-center p-4 backdrop-blur-sm hidden flex">
+            <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[80vh]">
+                <div class="bg-blue-600 p-5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+                                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Panduan Ujian</h3>
+                    </div>
+                </div>
+                
+                <div class="p-6 overflow-y-auto space-y-4 bg-slate-50 flex-1">
+                    <div class="flex gap-3">
+                        <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">1</div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">Koneksi Jaringan</h4>
+                            <p class="text-xs text-slate-600 mt-1">Pastikan HP/Laptop Anda sudah terhubung ke jaringan WiFi lokal sekolah (Offline).</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">2</div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">Atur IP Server</h4>
+                            <p class="text-xs text-slate-600 mt-1">Buka menu <b>Beranda</b>. Gunakan fitur <b>Scan QR</b> ke komputer pengawas, atau <b>Input IP Server</b> secara manual.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">3</div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800">Mulai Ujian</h4>
+                            <p class="text-xs text-slate-600 mt-1">Jika IP server sudah terbaca di layar, tekan tombol biru besar <b>Mulai E-Ujian</b> untuk masuk ke soal.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="w-6 h-6 rounded-full bg-red-100 text-red-700 flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">!</div>
+                        <div>
+                            <h4 class="text-sm font-bold text-red-700">Peringatan</h4>
+                            <p class="text-xs text-slate-600 mt-1">Jangan menekan tombol keluar atau menutup aplikasi secara paksa selama ujian berlangsung, karena akan membunyikan alarm pada perangkat Anda.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-4 bg-white border-t border-slate-100">
+                    <button onclick="closeGuideModal()" class="w-full py-3.5 rounded-xl bg-slate-100 text-slate-700 font-bold active:bg-slate-200 transition-colors">
+                        Tutup Panduan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Scan QR -->
+        <div id="modal-qr" class="absolute inset-0 bg-black z-[60] flex-col hidden flex">
+            <div class="relative flex-1 bg-gray-900 overflow-hidden">
+                <video id="qr-video" autoplay playsinline muted class="w-full h-full object-cover opacity-80"></video>
+                
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <div id="qr-frame" class="w-64 h-64 border-4 border-blue-500 shadow-[0_0_50px_rgba(59,130,246,0.3)] rounded-[2rem] relative overflow-hidden transition-colors duration-300">
+                        <div id="qr-scan-line" class="absolute left-0 w-full h-1 bg-blue-400 shadow-[0_0_20px_5px_rgba(59,130,246,0.8)] animate-scan"></div>
+                    </div>
+                    
+                    <p id="qr-error-text" class="text-white mt-8 font-bold bg-red-600/90 px-6 py-3 rounded-full text-sm text-center shadow-lg border border-red-400 animate-pulse hidden">
+                        Error Message
+                    </p>
+                    <p id="qr-info-text" class="text-white mt-8 font-medium bg-black/50 px-4 py-2 rounded-full text-sm">
+                        Arahkan QR Code IP Server ke dalam bingkai
+                    </p>
+                </div>
+            </div>
+            
+            <div class="bg-black py-8 px-6 pb-12 rounded-t-3xl border-t border-slate-800 -mt-6 relative z-10 flex flex-col items-center">
+                <h3 class="text-white font-bold mb-6">Pemindai QR Code</h3>
+                <button onclick="stopScan()" class="w-full max-w-xs py-4 bg-red-600 text-white font-bold rounded-2xl active:scale-95 transition-transform">
+                    Batal Scan
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Script Utama (Logika Vanilla JS) -->
+    <script>
+        // State Variabel
+        let serverIp = '192.168.0.123/smp6/login.php';
+        let mediaStream = null;
+        let isScanning = false;
+        let scanAnimFrame = null;
+        
+        // State Tahan Tombol Keluar
+        let holdTimer = null;
+        let holdProgressInterval = null;
+        let holdDuration = 0;
+
+        // ==============================================
+        // FUNGSI TAHAN 5 DETIK UNTUK KELUAR
+        // ==============================================
+        function startHoldExit(e) {
+            // Mencegah menu klik kanan/context menu saat ditahan di HP
+            if(e && e.type === 'touchstart') e.preventDefault(); 
+
+            holdDuration = 0;
+            const progressBar = document.getElementById('hold-progress');
+            progressBar.style.height = '0%';
+
+            // Update animasi background merah setiap 100ms
+            holdProgressInterval = setInterval(() => {
+                holdDuration += 100;
+                let percent = (holdDuration / 5000) * 100;
+                progressBar.style.height = percent + '%';
+            }, 100);
+
+            // Jika berhasil ditahan tepat 5 detik (5000 ms)
+            holdTimer = setTimeout(() => {
+                clearInterval(holdProgressInterval);
+                progressBar.style.height = '100%';
+                
+                // Bunyikan Alarm
+                triggerAlarm();
+                
+                // Kembalikan status tombol
+                setTimeout(() => {
+                    holdDuration = 0;
+                    progressBar.style.height = '0%';
+                }, 500);
+
+                // Keluarkan layar penuh jika ada
+                if (document.fullscreenElement) {
+                    document.exitFullscreen().catch(err => console.log(err));
+                }
+
+                // Hapus sesi & kembali ke login
+                document.getElementById('input-password').value = '';
+                switchScreen('login');
+                showToast("Sesi ditutup paksa.");
+
+            }, 5000);
+        }
+
+        function cancelHoldExit(e) {
+            clearTimeout(holdTimer);
+            clearInterval(holdProgressInterval);
+            holdDuration = 0;
+            document.getElementById('hold-progress').style.height = '0%';
+        }
+
+        // ==============================================
+        // LOGIKA LOGIN
+        // ==============================================
+        function hideLoginError() {
+            document.getElementById('error-login').classList.add('hidden');
+            document.getElementById('input-password').classList.remove('border-red-500');
+            document.getElementById('input-password').classList.add('border-slate-200', 'focus:border-blue-600');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const password = document.getElementById('input-password').value;
+            
+            if (password === 'siswa') {
+                hideLoginError();
+                switchScreen('home');
+                updateGreeting();
+                updateWifiStatus();
+            } else {
+                document.getElementById('error-login').classList.remove('hidden');
+                document.getElementById('input-password').classList.add('border-red-500');
+                document.getElementById('input-password').classList.remove('border-slate-200', 'focus:border-blue-600');
+            }
+        }
+
+        // ==============================================
+        // FUNGSI ALARM (TEXT-TO-SPEECH)
+        // ==============================================
+        function triggerAlarm() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const pesan = new SpeechSynthesisUtterance("Mohon jangan keluar dari aplikasi Ujian");
+                pesan.lang = 'id-ID';
+                pesan.volume = 1.0;
+                pesan.rate = 0.9;
+                pesan.pitch = 0.5;
+
+                const voices = window.speechSynthesis.getVoices();
+                const indoVoice = voices.find(voice => voice.lang.includes('id') || voice.lang.includes('ID'));
+                if (indoVoice) pesan.voice = indoVoice;
+
+                window.speechSynthesis.speak(pesan);
+            } else {
+                alert("Mohon jangan keluar dari aplikasi Ujian!");
+            }
+        }
+
+        // ==============================================
+        // PENGATURAN WAKTU & WIFI
+        // ==============================================
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            let greeting = 'Selamat Pagi';
+            if (hour >= 12 && hour < 15) greeting = 'Selamat Siang';
+            else if (hour >= 15 && hour < 18) greeting = 'Selamat Sore';
+            else if (hour >= 18) greeting = 'Selamat Malam';
+            document.getElementById('txt-greeting').innerText = greeting;
+        }
+
+        function updateWifiStatus() {
+            const hasInternet = navigator.onLine;
+            const indicator = document.getElementById('wifi-indicator');
+            const statusText = document.getElementById('wifi-status-text');
+
+            if (hasInternet) {
+                indicator.className = "absolute bottom-0 right-0 w-6 h-6 border-2 border-white rounded-full bg-amber-500";
+                statusText.className = "text-sm font-bold mt-1 text-amber-600";
+                statusText.innerText = "Status: Online (Akses Internet Terbuka)";
+            } else {
+                indicator.className = "absolute bottom-0 right-0 w-6 h-6 border-2 border-white rounded-full bg-green-500";
+                statusText.className = "text-sm font-bold mt-1 text-emerald-600";
+                statusText.innerText = "Status: Jaringan Lokal (Mode Ujian)";
+            }
+        }
+
+        window.addEventListener('online', updateWifiStatus);
+        window.addEventListener('offline', updateWifiStatus);
+
+        // ==============================================
+        // TOAST NOTIFICATION
+        // ==============================================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => toast.classList.remove('opacity-0'), 10);
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        // ==============================================
+        // FUNGSI NAVIGASI LAYAR
+        // ==============================================
+        function switchScreen(screenName) {
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-profile').classList.add('hidden');
+            
+            if (screenName === 'login') {
+                document.getElementById('screen-login').classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.add('hidden');
+            } else {
+                document.getElementById('screen-' + screenName).classList.remove('hidden');
+                document.getElementById('bottom-nav').classList.remove('hidden');
+                
+                const bgHome = document.getElementById('nav-bg-home');
+                const txtHome = document.getElementById('nav-txt-home');
+                const bgProfile = document.getElementById('nav-bg-profile');
+                const txtProfile = document.getElementById('nav-txt-profile');
+
+                if (screenName === 'home') {
+                    bgHome.className = "px-5 py-1.5 rounded-full transition-colors duration-300 bg-blue-200 text-blue-800";
+                    txtHome.className = "text-[11px] font-bold text-blue-800";
+                    bgProfile.className = "px-5 py-1.5 rounded-full transition-colors duration-300 text-slate-600";
+                    txtProfile.className = "text-[11px] font-bold text-slate-600";
+                } else if (screenName === 'profile') {
+                    bgProfile.className = "px-5 py-1.5 rounded-full transition-colors duration-300 bg-blue-200 text-blue-800";
+                    txtProfile.className = "text-[11px] font-bold text-blue-800";
+                    bgHome.className = "px-5 py-1.5 rounded-full transition-colors duration-300 text-slate-600";
+                    txtHome.className = "text-[11px] font-bold text-slate-600";
+                }
+            }
+        }
+
+        // ==============================================
+        // MODAL INPUT IP
+        // ==============================================
+        function openIpModal() {
+            document.getElementById('input-ip').value = serverIp;
+            document.getElementById('error-ip').classList.add('hidden');
+            document.getElementById('modal-ip').classList.remove('hidden');
+        }
+
+        function closeIpModal() {
+            document.getElementById('modal-ip').classList.add('hidden');
+        }
+
+        function saveIp() {
+            const tempIp = document.getElementById('input-ip').value;
+            const ipRegex = /^(?:https?:\/\/)?(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:\d{1,5})?(?:\/.*)?$/i;
+            
+            if (ipRegex.test(tempIp.trim())) {
+                serverIp = tempIp.trim();
+                document.getElementById('txt-server-ip').innerText = serverIp;
+                closeIpModal();
+                showToast("IP Server disimpan: " + serverIp);
+            } else {
+                document.getElementById('error-ip').classList.remove('hidden');
+            }
+        }
+
+        // ==============================================
+        // MODAL PANDUAN
+        // ==============================================
+        function openGuideModal() { document.getElementById('modal-guide').classList.remove('hidden'); }
+        function closeGuideModal() { document.getElementById('modal-guide').classList.add('hidden'); }
+
+        // ==============================================
+        // MULAI UJIAN
+        // ==============================================
+        function mulaiUjian() {
+            if (!serverIp) {
+                openIpModal();
+                document.getElementById('error-ip').innerText = "Silakan atur IP server terlebih dahulu.";
+                document.getElementById('error-ip').classList.remove('hidden');
+            } else {
+                let targetUrl = serverIp;
+                if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+                    targetUrl = 'http://' + targetUrl;
+                }
+                
+                const docElm = document.documentElement;
+                if (docElm.requestFullscreen) {
+                    docElm.requestFullscreen().catch(err => console.log("Fullscreen ditolak:", err));
+                } else if (docElm.webkitRequestFullscreen) {
+                    docElm.webkitRequestFullscreen().catch(err => console.log(err));
+                } else if (docElm.msRequestFullscreen) {
+                    docElm.msRequestFullscreen().catch(err => console.log(err));
+                }
+
+                showToast("Mengalihkan ke ujian...");
+                
+                // JEDA DIPERCEPAT MENJADI 0.5 DETIK
+                setTimeout(() => {
+                    window.location.href = targetUrl; 
+                }, 500);
+            }
+        }
+
+        // ==============================================
+        // QR SCANNER (NATIVE JS)
+        // ==============================================
+        async function openQrModal() {
+            document.getElementById('modal-qr').classList.remove('hidden');
+            document.getElementById('qr-error-text').classList.add('hidden');
+            document.getElementById('qr-info-text').classList.remove('hidden');
+            
+            const frame = document.getElementById('qr-frame');
+            const scanLine = document.getElementById('qr-scan-line');
+            frame.className = "w-64 h-64 border-4 border-blue-500 shadow-[0_0_50px_rgba(59,130,246,0.3)] rounded-[2rem] relative overflow-hidden transition-colors duration-300";
+            scanLine.className = "absolute left-0 w-full h-1 bg-blue-400 shadow-[0_0_20px_5px_rgba(59,130,246,0.8)] animate-scan";
+
+            isScanning = true;
+            const video = document.getElementById('qr-video');
+
+            try {
+                mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                video.srcObject = mediaStream;
+                video.play();
+
+                if ('BarcodeDetector' in window) {
+                    const barcodeDetector = new window.BarcodeDetector({ formats: ['qr_code'] });
+                    
+                    const detect = async () => {
+                        if (!isScanning) return;
+                        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                            try {
+                                const barcodes = await barcodeDetector.detect(video);
+                                if (barcodes.length > 0) {
+                                    const qrText = barcodes[0].rawValue.trim();
+                                    const ipRegex = /^(?:https?:\/\/)?(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:\d{1,5})?(?:\/.*)?$/i;
+                                    
+                                    if (ipRegex.test(qrText)) {
+                                        serverIp = qrText;
+                                        document.getElementById('txt-server-ip').innerText = serverIp;
+                                        showToast("IP Server discan: " + serverIp);
+                                        stopScan();
+                                        return;
+                                    } else {
+                                        showQrError("QR Ditolak: Bukan IP Lokal! (" + qrText + ")");
+                                        isScanning = false;
+                                        setTimeout(() => { isScanning = true; scanAnimFrame = requestAnimationFrame(detect); }, 3000);
+                                        return;
+                                    }
+                                }
+                            } catch (e) { console.error(e); }
+                        }
+                        scanAnimFrame = requestAnimationFrame(detect);
+                    };
+                    scanAnimFrame = requestAnimationFrame(detect);
+                } else {
+                    showQrError("Perangkat tidak mendukung pemindaian otomatis.");
+                }
+            } catch (err) {
+                console.error("Kamera error", err);
+                showToast("Gagal mengakses kamera. Periksa izin.");
+                stopScan();
+            }
+        }
+
+        function showQrError(msg) {
+            const frame = document.getElementById('qr-frame');
+            const scanLine = document.getElementById('qr-scan-line');
+            const errorText = document.getElementById('qr-error-text');
+            
+            frame.className = "w-64 h-64 border-4 border-red-500 shadow-[0_0_50px_rgba(239,68,68,0.5)] rounded-[2rem] relative overflow-hidden transition-colors duration-300";
+            scanLine.className = "absolute left-0 w-full h-1 bg-red-400 shadow-[0_0_20px_5px_rgba(239,68,68,0.8)] animate-scan";
+            
+            document.getElementById('qr-info-text').classList.add('hidden');
+            errorText.innerText = msg;
+            errorText.classList.remove('hidden');
+
+            setTimeout(() => {
+                if (isScanning) {
+                    frame.className = "w-64 h-64 border-4 border-blue-500 shadow-[0_0_50px_rgba(59,130,246,0.3)] rounded-[2rem] relative overflow-hidden transition-colors duration-300";
+                    scanLine.className = "absolute left-0 w-full h-1 bg-blue-400 shadow-[0_0_20px_5px_rgba(59,130,246,0.8)] animate-scan";
+                    document.getElementById('qr-info-text').classList.remove('hidden');
+                    errorText.classList.add('hidden');
+                }
+            }, 3000);
+        }
+
+        function stopScan() {
+            isScanning = false;
+            if (scanAnimFrame) cancelAnimationFrame(scanAnimFrame);
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+            }
+            document.getElementById('modal-qr').classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
